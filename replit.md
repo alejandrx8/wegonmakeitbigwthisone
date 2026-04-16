@@ -16,6 +16,16 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
 
+## Artifacts
+
+### Snake Game (`artifacts/snake-game`)
+- React + Vite frontend-only mini game (no backend)
+- Classic snake game with levels, score tracking, high score persistence (localStorage)
+- Grid: 20x20, 10 levels with increasing speed
+- Mobile D-pad controls + keyboard (WASD / arrow keys)
+- Dark neon theme (green snake, red food, dark background)
+- Preview path: `/`
+
 ## Key Commands
 
 - `pnpm run typecheck` — full typecheck across all packages
