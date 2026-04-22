@@ -5,7 +5,7 @@ export interface Position {
   y: number;
 }
 
-export type GameStatus = "idle" | "playing" | "paused" | "gameover";
+export type GameStatus = "idle" | "playing" | "paused" | "gameover" | "won";
 
 export interface GameState {
   snake: Position[];

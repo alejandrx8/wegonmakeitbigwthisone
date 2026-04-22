@@ -86,6 +86,38 @@ export default function GameOverlay({ status, score, highScore, onStart, onPause
         </>
       )}
 
+      {status === "won" && (
+        <>
+          <div className="text-center">
+            <div className="text-3xl font-mono font-black text-yellow-300 drop-shadow-[0_0_18px_rgba(250,204,21,0.8)] animate-pulse">
+              YOU WIN!
+            </div>
+            <div className="text-xs font-mono font-bold tracking-widest text-yellow-200 mt-2">
+              YOU FILLED THE BOARD
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-muted-foreground font-mono">FINAL SCORE</div>
+            <div className="text-3xl font-mono font-black text-primary drop-shadow-[0_0_12px_hsl(142_76%_48%/0.7)] tabular-nums">
+              {score.toString().padStart(4, "0")}
+            </div>
+          </div>
+          <button
+            onClick={onStart}
+            className="px-8 py-3 rounded-lg font-mono font-bold text-sm tracking-widest uppercase"
+            style={{
+              background: "hsl(48 96% 60%)",
+              color: "hsl(222 47% 8%)",
+              border: "none",
+              cursor: "pointer",
+              boxShadow: "0 0 20px hsl(48 96% 60% / 0.6)",
+            }}
+          >
+            PLAY AGAIN
+          </button>
+        </>
+      )}
+
       {status === "gameover" && (
         <>
           <div className="text-center">

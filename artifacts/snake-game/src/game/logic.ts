@@ -65,8 +65,25 @@ export function moveSnake(state: GameState): GameState {
   const newFoodsEaten = ateFood ? foodsEaten + 1 : foodsEaten;
   const newScore = ateFood ? score + level * 10 : score;
   const newLevel = Math.floor(newFoodsEaten / 5) + 1;
-  const newFood = ateFood ? generateFood(newSnake) : food;
   const newHighScore = Math.max(newScore, highScore);
+
+  // Win condition: snake fills the entire board
+  const maxLength = GRID_SIZE * GRID_SIZE;
+  if (ateFood && newSnake.length >= maxLength) {
+    return {
+      ...state,
+      snake: newSnake,
+      food: newHead, // hide food under head
+      direction,
+      score: newScore,
+      highScore: newHighScore,
+      level: newLevel,
+      foodsEaten: newFoodsEaten,
+      status: "won",
+    };
+  }
+
+  const newFood = ateFood ? generateFood(newSnake) : food;
 
   return {
     ...state,

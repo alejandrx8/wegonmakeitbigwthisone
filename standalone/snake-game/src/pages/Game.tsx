@@ -80,6 +80,15 @@ export default function Game() {
         }
       }
 
+      if (next.status === "won") {
+        saveHighScore(next.highScore);
+        try {
+          navigator.vibrate?.([80, 40, 80, 40, 80, 40, 200]);
+        } catch {
+          // ignore
+        }
+      }
+
       if (next.score > prev.score) {
         const head = next.snake[0];
         const id = ++floatIdRef.current;
@@ -123,7 +132,7 @@ export default function Game() {
 
   const handleStart = useCallback(() => {
     setGameState((prev) => {
-      if (prev.status === "idle" || prev.status === "gameover") {
+      if (prev.status === "idle" || prev.status === "gameover" || prev.status === "won") {
         return { ...getInitialState(prev.highScore), status: "playing" };
       }
       return prev;
@@ -168,7 +177,7 @@ export default function Game() {
         case " ":
         case "Escape":
           e.preventDefault();
-          if (gameStateRef.current.status === "idle" || gameStateRef.current.status === "gameover") {
+          if (gameStateRef.current.status === "idle" || gameStateRef.current.status === "gameover" || gameStateRef.current.status === "won") {
             handleStart();
           } else {
             handlePause();
@@ -176,7 +185,7 @@ export default function Game() {
           break;
         case "Enter":
           e.preventDefault();
-          if (gameStateRef.current.status === "idle" || gameStateRef.current.status === "gameover") {
+          if (gameStateRef.current.status === "idle" || gameStateRef.current.status === "gameover" || gameStateRef.current.status === "won") {
             handleStart();
           }
           break;
