@@ -1,13 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import GameBoard from "@/components/GameBoard";
 import ScorePanel from "@/components/ScorePanel";
 import GameOverlay from "@/components/GameOverlay";
 import MobileControls from "@/components/MobileControls";
-import { GameState, getSpeed } from "@/game/types";
+import { GameState, getSpeed, GRID_SIZE, CELL_SIZE } from "@/game/types";
 import { getInitialState, isValidDirectionChange, moveSnake } from "@/game/logic";
 import { Direction } from "@/game/types";
 
 const HIGH_SCORE_KEY = "snake_high_score";
+const BOARD_PX = GRID_SIZE * CELL_SIZE;
 
 function loadHighScore(): number {
   try {
@@ -30,10 +31,33 @@ export default function Game() {
     getInitialState(loadHighScore())
   );
   const [floatingScores, setFloatingScores] = useState<{ id: number; x: number; y: number; value: number }[]>([]);
+  const [boardScale, setBoardScale] = useState(1);
   const floatIdRef = useRef(0);
   const tickRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const gameStateRef = useRef(gameState);
   gameStateRef.current = gameState;
+
+  // Compute board scale to fit the viewport (portrait mobile-first)
+  useLayoutEffect(() => {
+    const computeScale = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      // Reserve space for: header (~44), score (~56), controls (~210), gaps & padding (~60)
+      const reservedV = 44 + 56 + 210 + 60;
+      const availableW = vw - 16; // 8px side padding x2
+      const availableH = vh - reservedV;
+      const target = Math.min(availableW, availableH, 520);
+      const scale = Math.max(0.4, target / BOARD_PX);
+      setBoardScale(scale);
+    };
+    computeScale();
+    window.addEventListener("resize", computeScale);
+    window.addEventListener("orientationchange", computeScale);
+    return () => {
+      window.removeEventListener("resize", computeScale);
+      window.removeEventListener("orientationchange", computeScale);
+    };
+  }, []);
 
   const clearTick = useCallback(() => {
     if (tickRef.current != null) {
@@ -51,7 +75,6 @@ export default function Game() {
         saveHighScore(next.highScore);
       }
 
-      // Detect food eaten
       if (next.score > prev.score) {
         const head = next.snake[0];
         const id = ++floatIdRef.current;
@@ -150,10 +173,36 @@ export default function Game() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [handleDirection, handleStart, handlePause]);
 
+  // Swipe controls on the board for touch devices
+  const touchRef = useRef<{ x: number; y: number } | null>(null);
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchRef.current = { x: t.clientX, y: t.clientY };
+  }, []);
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      const start = touchRef.current;
+      if (!start) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - start.x;
+      const dy = t.clientY - start.y;
+      const ax = Math.abs(dx);
+      const ay = Math.abs(dy);
+      const threshold = 20;
+      if (Math.max(ax, ay) < threshold) return;
+      if (ax > ay) handleDirection(dx > 0 ? "RIGHT" : "LEFT");
+      else handleDirection(dy > 0 ? "DOWN" : "UP");
+      touchRef.current = null;
+    },
+    [handleDirection]
+  );
+
+  const scaledSize = BOARD_PX * boardScale;
+
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 select-none">
-      <div className="flex flex-col items-center gap-4 w-full max-w-lg">
-        <h1 className="text-3xl font-bold tracking-wider font-mono text-primary drop-shadow-[0_0_12px_hsl(142_76%_48%/0.6)]">
+    <div className="min-h-[100dvh] bg-background flex flex-col items-center px-2 py-2 select-none overflow-hidden">
+      <div className="flex flex-col items-center gap-2 w-full max-w-md flex-1">
+        <h1 className="text-2xl font-bold tracking-[0.3em] font-mono text-primary drop-shadow-[0_0_12px_hsl(142_76%_48%/0.6)]">
           SNAKE
         </h1>
 
@@ -163,8 +212,22 @@ export default function Game() {
           level={gameState.level}
         />
 
-        <div className="relative">
-          <GameBoard gameState={gameState} floatingScores={floatingScores} />
+        <div
+          className="relative"
+          style={{ width: scaledSize, height: scaledSize }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div
+            style={{
+              transform: `scale(${boardScale})`,
+              transformOrigin: "top left",
+              width: BOARD_PX,
+              height: BOARD_PX,
+            }}
+          >
+            <GameBoard gameState={gameState} floatingScores={floatingScores} />
+          </div>
           <GameOverlay
             status={gameState.status}
             score={gameState.score}
@@ -175,10 +238,6 @@ export default function Game() {
         </div>
 
         <MobileControls onDirection={handleDirection} status={gameState.status} onStart={handleStart} onPause={handlePause} />
-
-        <p className="text-muted-foreground text-xs font-mono mt-1">
-          WASD / Arrow keys to move &middot; Space to pause
-        </p>
       </div>
     </div>
   );

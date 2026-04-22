@@ -6,7 +6,7 @@ interface Props {
 
 export default function ScorePanel({ score, highScore, level }: Props) {
   return (
-    <div className="flex gap-3 w-full justify-center">
+    <div className="flex gap-2 w-full justify-center">
       <StatBox label="SCORE" value={score} primary />
       <StatBox label="BEST" value={highScore} />
       <StatBox label="LEVEL" value={level} accent />
@@ -27,11 +27,11 @@ function StatBox({ label, value, primary, accent }: { label: string; value: numb
     : "";
 
   return (
-    <div className="flex flex-col items-center bg-card border border-border rounded-lg px-5 py-2 min-w-[90px]">
-      <span className="text-[10px] font-mono font-semibold text-muted-foreground tracking-widest">
+    <div className="flex flex-col items-center bg-card border border-border rounded-lg px-3 py-1.5 flex-1 min-w-0">
+      <span className="text-[9px] font-mono font-semibold text-muted-foreground tracking-widest">
         {label}
       </span>
-      <span className={`text-xl font-mono font-bold tabular-nums ${color} ${glow}`}>
+      <span className={`text-lg font-mono font-bold tabular-nums leading-tight ${color} ${glow}`}>
         {value.toString().padStart(4, "0")}
       </span>
     </div>
