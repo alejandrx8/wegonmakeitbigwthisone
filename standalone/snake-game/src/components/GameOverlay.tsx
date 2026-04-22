@@ -36,7 +36,7 @@ export default function GameOverlay({ status, score, highScore, onStart, onPause
               SNAKE
             </div>
             <p className="text-muted-foreground text-sm mt-1 font-mono">
-              Classic arcade game
+              Bet u can&apos;t get to the end lol
             </p>
           </div>
           <button
