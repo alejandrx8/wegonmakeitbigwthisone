@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: hsl(222 47% 8%);
+  --color-foreground: hsl(210 40% 98%);
+  --color-border: hsl(222 40% 18%);
+  --color-card: hsl(222 47% 11%);
+  --color-card-foreground: hsl(210 40% 98%);
+  --color-primary: hsl(142 76% 48%);
+  --color-primary-foreground: hsl(222 47% 8%);
+  --color-muted: hsl(222 40% 18%);
+  --color-muted-foreground: hsl(215 20% 60%);
+
+  --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Menlo, monospace;
+  --radius: 0.75rem;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 8px 2px hsl(0 84% 60% / 0.4); }
+  50% { box-shadow: 0 0 16px 4px hsl(0 84% 60% / 0.8); }
+}
+
+@keyframes float-score {
+  0% { opacity: 1; transform: translateY(0) translateX(-50%); }
+  100% { opacity: 0; transform: translateY(-40px) translateX(-50%); }
+}
+
+.float-score {
+  animation: float-score 0.8s ease-out forwards;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-bounce { animation: bounce 1s infinite; }
