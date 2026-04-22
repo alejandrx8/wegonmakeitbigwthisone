@@ -73,6 +73,11 @@ export default function Game() {
 
       if (next.status === "gameover") {
         saveHighScore(next.highScore);
+        try {
+          navigator.vibrate?.([60, 40, 120, 40, 200]);
+        } catch {
+          // ignore
+        }
       }
 
       if (next.score > prev.score) {
@@ -83,6 +88,14 @@ export default function Game() {
         setTimeout(() => {
           setFloatingScores((fs) => fs.filter((f) => f.id !== id));
         }, 900);
+
+        // Stronger buzz on level-up, lighter on each food
+        const leveledUp = next.level > prev.level;
+        try {
+          navigator.vibrate?.(leveledUp ? [30, 30, 60] : 25);
+        } catch {
+          // ignore
+        }
       }
 
       return next;
